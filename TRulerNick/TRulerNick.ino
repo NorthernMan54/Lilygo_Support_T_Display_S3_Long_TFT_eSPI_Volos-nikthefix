@@ -37,7 +37,6 @@
   
 */
 
-
 #include "AXS15231B.h"
 #include <TFT_eSPI.h>
 #include <Wire.h>
@@ -47,6 +46,7 @@
 #include "fontS.h"
 #include "fontT.h"
 #include "yt.h"
+
 // For bitmap encoding: use Image2lcd, 16bit true colour, MSB First, RGB565, don't include head data, be sure to set max image size, save as .h file.
 
 TFT_eSPI tft = TFT_eSPI();
@@ -135,14 +135,28 @@ void draw()
  sprite.setTextColor(0x8410,TFT_BLACK);
  sprite.drawString("VOLOS PROJECTS ",494,161);
  sprite.pushImage(604,158,30,20,yt);
- lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t*)sprite.getPointer());
+ lcd_PushColors_rotated_90(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t*)sprite.getPointer());
 
 }
 
     
 void setup() {
-    pinMode(TOUCH_INT, INPUT_PULLUP);
-    sprite.createSprite(640, 180);    // full screen landscape sprite in psram
+  #ifdef ARDUINO_USB_CDC_ON_BOOT
+    delay(2000);
+#endif
+    Serial.begin(115200);
+    Serial.setDebugOutput(true);
+    Serial.println("\n\n\n");
+    Serial.println("T-Display S3 Long Calculator GUI by Volos Projects");
+    log_i("Board: %s", BOARD_NAME);
+    log_i("CPU: %s rev%d, CPU Freq: %d Mhz, %d core(s)", ESP.getChipModel(), ESP.getChipRevision(), getCpuFrequencyMhz(), ESP.getChipCores());
+    log_i("Free heap: %d bytes", ESP.getFreeHeap());
+    log_i("Free PSRAM: %d bytes", ESP.getPsramSize());
+    log_i("SDK version: %s", ESP.getSdkVersion());
+    Serial.println( DISPLAY_WIDTH);
+    Serial.println(DISPLAY_HEIGHT);
+    // pinMode(TOUCH_INT, INPUT_PULLUP);
+    sprite.createSprite(DISPLAY_WIDTH, DISPLAY_HEIGHT);    // full screen landscape sprite in psram
     sprite.setSwapBytes(1);
 
     // comment out if using variable brightness
@@ -157,16 +171,16 @@ void setup() {
     
 
     //ini touch screen 
-    pinMode(TOUCH_RES, OUTPUT);
-    digitalWrite(TOUCH_RES, HIGH);delay(2);
-    digitalWrite(TOUCH_RES, LOW);delay(10);
-    digitalWrite(TOUCH_RES, HIGH);delay(2);
+    // pinMode(TOUCH_RES, OUTPUT);
+    // digitalWrite(TOUCH_RES, HIGH);delay(2);
+    // digitalWrite(TOUCH_RES, LOW);delay(10);
+    // digitalWrite(TOUCH_RES, HIGH);delay(2);
     Wire.begin(TOUCH_IICSDA, TOUCH_IICSCL);
 
     //init display 
     axs15231_init();
     draw();
-    
+        Serial.println("T-Display S3 Long Calculator GUI by Volos Projects done");
 }
 
 void getTouch()
@@ -187,14 +201,14 @@ void getTouch()
     pointX = AXS_GET_POINT_X(buff,0);
     pointY = AXS_GET_POINT_Y(buff,0);
 
-        if(pointX > 640) pointX = 640;
-        if(pointY > 180) pointY = 180;
+        if(pointX > DISPLAY_WIDTH) pointX = DISPLAY_WIDTH;
+        if(pointY > DISPLAY_HEIGHT) pointY = DISPLAY_HEIGHT;
 
         
-        tx=map(pointX,627,10,0,640);
-        ty=map(pointY,180,0,0,180);
+        tx=map(pointX,627,10,0,DISPLAY_WIDTH);
+        ty=map(pointY,DISPLAY_HEIGHT,0,0,DISPLAY_HEIGHT);
         
-        if(tx>180 && tx<590) return;  //mask invalid touch area
+        if(tx>DISPLAY_HEIGHT && tx<590) return;  //mask invalid touch area
         if(ty>50 && tx>590) return;   //mask invalid tough area
 
         for(int i=0;i<4;i++)
@@ -203,7 +217,7 @@ void getTouch()
         if(ty>ypos[i] && ty<ypos[i]+44)
         cy=i;}
 
-        if(tx>=590 && tx<=640 && ty>=0 && ty<=50)
+        if(tx>=590 && tx<=DISPLAY_WIDTH && ty>=0 && ty<=50)
         {num=""; numBuf=0; operation=0; cx=-1; cy=-1;}
 
     if (cx>=0 && cx<4 && cy>=0 && cy<4 ) {
@@ -269,8 +283,9 @@ void getTouch()
 
 void loop() 
 {     
-  if(digitalRead(TOUCH_INT)==LOW) 
-    {
+  Serial.println("loop");
+//  if(digitalRead(TOUCH_INT)==LOW) 
+//    {
       if(touch_held==false)
         {
         getTouch();
@@ -278,7 +293,7 @@ void loop()
         }
       touch_held=true;
       touch_timeout=0;
-    }    
+//    }    
 
   touch_timeout++;
 

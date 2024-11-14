@@ -35,23 +35,23 @@
 //#define LVGL_LCD_BUF_SIZE     (EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES)
 
 #define SEND_BUF_SIZE         (28800/2) //
-#define TFT_QSPI_CS           12
-#define TFT_QSPI_SCK          17
-#define TFT_QSPI_D0           13
-#define TFT_QSPI_D1           18
-#define TFT_QSPI_D2           21
-#define TFT_QSPI_D3           14
-#define TFT_QSPI_RST          16
-#define TFT_BL                1
+#define TFT_QSPI_CS           AXS15231B_QSPI_CS
+#define TFT_QSPI_SCK          AXS15231B_QSPI_SCK
+#define TFT_QSPI_D0           AXS15231B_QSPI_D0
+#define TFT_QSPI_D1           AXS15231B_QSPI_D1
+#define TFT_QSPI_D2           AXS15231B_QSPI_D2
+#define TFT_QSPI_D3           AXS15231B_QSPI_D3
+#define TFT_QSPI_RST          AXS15231B_QSPI_RST
+#define TFT_BL                AXS15231B_QSPI_BL
 #define PIN_BAT_VOLT          8
 #define PIN_BUTTON_1          0
 #define PIN_BUTTON_2          21
 
 
-#define TOUCH_IICSCL 10
-#define TOUCH_IICSDA 15
-#define TOUCH_INT 11
-#define TOUCH_RES 16
+#define TOUCH_IICSCL AXS15231B_TOUCH_I2C_SCL
+#define TOUCH_IICSDA AXS15231B_TOUCH_I2C_SDA
+#define TOUCH_INT -1
+#define TOUCH_RES -1
 
 #define AXS_TOUCH_ONE_POINT_LEN             6
 #define AXS_TOUCH_BUF_HEAD_LEN              2
